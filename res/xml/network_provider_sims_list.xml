@@ -26,6 +26,17 @@
         settings:controller="com.android.settings.network.NetworkProviderSimListController"/>
 
     <com.android.settingslib.RestrictedPreference
+        android:key="physical_sim_slot_2"
+        settings:isPreferenceVisible="false"
+        settings:userRestriction="no_config_mobile_networks"
+        settings:useAdminDisabledSummary="true"
+        settings:searchable="false"
+        android:title="@string/sim_card_label"
+        android:summary="@string/mobile_network_inactive_sim"
+        android:icon="@drawable/ic_sim_card"
+        android:order="90" />
+
+    <com.android.settingslib.RestrictedPreference
         android:key="add_sim"
         settings:isPreferenceVisible="false"
         settings:userRestriction="no_config_mobile_networks"
