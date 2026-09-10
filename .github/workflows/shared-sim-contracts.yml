@@ -1,0 +1,62 @@
+name: Shared SIM UI contracts
+
+on:
+  push:
+    branches: [cmdr-chara/esim-android-ui-20260909]
+  pull_request:
+    branches: [lineage-23.2]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Reject whitespace errors
+        run: git diff --check HEAD^ HEAD
+      - name: Verify manifest, resources, and continuation boundaries
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          android = "{http://schemas.android.com/apk/res/android}"
+          manifest = ET.parse("AndroidManifest.xml").getroot()
+          activity = next(
+              item for item in manifest.findall("./application/activity")
+              if item.get(android + "name") ==
+                  ".network.telephony.SharedSimSlotDialogActivity"
+          )
+          assert activity.get(android + "exported") == "true"
+          assert activity.get(android + "permission") == "android.permission.MODIFY_PHONE_STATE"
+          actions = {
+              item.get(android + "name")
+              for item in activity.findall("./intent-filter/action")
+          }
+          assert "com.android.settings.action.SHARED_SIM_SLOT_DIALOG" in actions
+
+          for resource in ("res/values/esim_slot.xml", "res/xml/network_provider_sims_list.xml"):
+              ET.parse(resource)
+
+          dialog = Path(
+              "src/com/android/settings/network/telephony/"
+              "SharedSimSlotDialogActivity.java"
+          ).read_text()
+          required = (
+              "continuation.getComponent() == null",
+              "continuation.getData() == null",
+              "PHONE_PACKAGE.equals(continuation.getPackage())",
+              "continuation.setComponent(null)",
+              "continuation.setPackage(PHONE_PACKAGE)",
+              "continuation.setData(null)",
+              "UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS",
+          )
+          for contract in required:
+              assert contract in dialog, f"missing boundary: {contract}"
+          PY
