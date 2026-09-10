@@ -27,10 +27,12 @@ import com.android.settings.SettingsActivity.EXTRA_FRAGMENT_ARG_KEY
 import com.android.settings.dashboard.DashboardFragment
 import com.android.settings.flags.Flags
 import com.android.settings.network.telephony.SimRepository
+import com.android.settings.network.telephony.EsimSlotSelection
 import com.android.settings.network.telephony.euicc.EuiccRepository
 import com.android.settings.search.BaseSearchIndexProvider
 import com.android.settings.spa.SpaActivity.Companion.startSpaActivity
 import com.android.settings.spa.network.NetworkCellularGroupProvider
+import com.android.settings.spa.network.getAddSimIntent
 import com.android.settingslib.search.SearchIndexable
 
 @SearchIndexable(forTarget = SearchIndexable.ALL and SearchIndexable.ARC.inv())
@@ -56,8 +58,16 @@ class MobileNetworkListFragment : DashboardFragment() {
         // Disable the animation of the preference list
         listView.itemAnimator = null
 
-        findPreference<Preference>(KEY_ADD_SIM)!!.isVisible =
-            EuiccRepository(requireContext()).showEuiccSettings()
+        findPreference<Preference>(KEY_ADD_SIM)!!.apply {
+            isVisible = EuiccRepository(requireContext()).showEuiccSettings()
+            intent = getAddSimIntent(requireContext())
+        }
+        findPreference<Preference>(EsimSlotSelection.PHYSICAL_SLOT_PREFERENCE_KEY)?.apply {
+            isVisible = EsimSlotSelection.isSupported(requireContext()) &&
+                EsimSlotSelection.isEmbeddedSlotSelected(requireContext())
+            title = getString(R.string.sim_editor_title, 2)
+            intent = EsimSlotSelection.physicalSlotIntent(requireContext())
+        }
     }
 
     override fun getPreferenceScreenResId() = R.xml.network_provider_sims_list
