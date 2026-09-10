@@ -944,6 +944,18 @@
         </activity>
 
         <activity
+            android:name=".network.telephony.SharedSimSlotDialogActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:permission="android.permission.MODIFY_PHONE_STATE"
+            android:theme="@style/Theme.AlertDialog.SimConfirmDialog">
+            <intent-filter>
+                <action android:name="com.android.settings.action.SHARED_SIM_SLOT_DIALOG" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name="Settings$WifiTetherSettingsActivity"
             android:label="@string/wifi_hotspot_checkbox_text"
             android:exported="true"

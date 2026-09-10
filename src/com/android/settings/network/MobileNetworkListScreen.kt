@@ -77,7 +77,7 @@ open class MobileNetworkListScreen(context: Context) :
     override val keywords: Int
         get() = R.string.keywords_more_mobile_networks
 
-    override fun intent(context: Context) = getAddSimIntent()
+    override fun intent(context: Context) = getAddSimIntent(context)
 
     override fun getMetricsCategory() = SettingsEnums.MOBILE_NETWORK_LIST
 

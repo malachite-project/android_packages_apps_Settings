@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.UserManager
 import android.telephony.SubscriptionInfo
-import android.telephony.euicc.EuiccManager
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.SimCard
@@ -34,13 +33,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.settings.R
-import com.android.settings.Utils
 import com.android.settings.network.SatelliteWarningDialogActivity
 import com.android.settings.network.SatelliteWarningDialogActivity.Companion.CUSTOM_CONTENT_BUTTON_NAME
 import com.android.settings.network.SatelliteWarningDialogActivity.Companion.CUSTOM_CONTENT_DESCRIPTION
 import com.android.settings.network.SatelliteWarningDialogActivity.Companion.CUSTOM_CONTENT_TITLE
 import com.android.settings.network.SubscriptionUtil
 import com.android.settings.network.telephony.MobileNetworkUtils
+import com.android.settings.network.telephony.EsimSlotSelection
 import com.android.settings.network.telephony.SubscriptionActivationRepository
 import com.android.settings.network.telephony.SubscriptionRepository
 import com.android.settings.network.telephony.euicc.EuiccRepository
@@ -62,6 +61,7 @@ fun SimsSection(subscriptionInfoList: List<SubscriptionInfo>) {
             SimPreference(subInfo)
         }
 
+        PhysicalSimSlot2()
         AddSim()
     }
 }
@@ -131,6 +131,24 @@ fun phoneNumber(subInfo: SubscriptionInfo): State<String?> {
 }
 
 @Composable
+private fun PhysicalSimSlot2() {
+    val context = LocalContext.current
+    if (!EsimSlotSelection.isSupported(context) ||
+        !EsimSlotSelection.isEmbeddedSlotSelected(context)) return
+    RestrictedPreference(
+        model = object : PreferenceModel {
+            override val title = stringResource(R.string.sim_editor_title, 2)
+            override val summary = { context.getString(R.string.mobile_network_inactive_sim) }
+            override val icon = @Composable { SettingsIcon(Icons.Outlined.SimCard) }
+            override val onClick = {
+                context.startActivity(EsimSlotSelection.physicalSlotIntent(context))
+            }
+        },
+        restrictions = Restrictions(keys = listOf(UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS)),
+    )
+}
+
+@Composable
 private fun AddSim() {
     val context = LocalContext.current
     val isShow by
@@ -149,12 +167,14 @@ private fun AddSim() {
     }
 }
 
-fun startAddSimFlow(context: Context) = context.startActivity(getAddSimIntent())
+fun startAddSimFlow(context: Context) = context.startActivity(getAddSimIntent(context))
 
-fun getAddSimIntent() = Intent(EuiccManager.ACTION_PROVISION_EMBEDDED_SUBSCRIPTION).apply {
-    setPackage(Utils.PHONE_PACKAGE_NAME)
-    putExtra(EuiccManager.EXTRA_FORCE_PROVISION, true)
-}
+fun getAddSimIntent(context: Context? = null): Intent =
+    if (context != null && EsimSlotSelection.isSupported(context)) {
+        EsimSlotSelection.addSimIntent(context)
+    } else {
+        EsimSlotSelection.standardAddSimIntent()
+    }
 
 fun startSatelliteWarningDialogFlow(context: Context) = context.startActivity(getSatelliteWarningDialogIntent(context))
 
