@@ -102,4 +102,6 @@
     <string name="battery_design_capacity_summary">%1$d מיליאמפר/שעה</string>
     <string name="battery_maximum_capacity">קיבולת מרבית</string>
     <string name="battery_maximum_capacity_summary">%1$d מיליאמפר/שעה  (%2$d%%)</string>
+    <string name="three_finger_screenshot_title">צילום מסך בשלוש אצבעות</string>
+    <string name="three_finger_screenshot_summary">החלקה למטה עם שלוש אצבעות מצלמת את המסך</string>
 </resources>
