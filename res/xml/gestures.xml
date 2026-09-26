@@ -81,6 +81,12 @@
         android:fragment="com.android.settings.gestures.PowerMenuSettings"
         settings:controller="com.android.settings.gestures.PowerMenuPreferenceController" />
 
+    <SwitchPreferenceCompat
+        android:key="gesture_three_finger_screenshot"
+        android:title="@string/three_finger_screenshot_title"
+        android:summary="@string/three_finger_screenshot_summary"
+        settings:controller="com.android.settings.gestures.ThreeFingerScreenshotPreferenceController" />
+
     <com.android.settingslib.PrimarySwitchPreference
         android:key="gesture_prevent_ringing_summary"
         android:title="@string/gesture_prevent_ringing_screen_title"
