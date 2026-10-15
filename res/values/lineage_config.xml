@@ -73,4 +73,8 @@
 
     <!-- Face enroll finish text -->
     <string name="security_settings_face_enroll_finish_description_with_bp">Now you can use your face to unlock your phone or verify it’s you, like when you sign in to apps or approve a purchase</string>
+
+    <!-- Refresh rates below this (Hz) are not offered as a minimum refresh rate,
+         e.g. a panel mode meant only for always-on display. 0 offers all. -->
+    <integer name="config_min_refresh_rate_lowest">0</integer>
 </resources>
