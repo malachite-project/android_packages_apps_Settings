@@ -18,8 +18,10 @@
 package com.android.settings.display;
 
 import android.content.Context;
+import android.database.ContentObserver;
 import android.hardware.display.DisplayManager;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.DeviceConfig;
 import android.provider.Settings;
 import android.util.Log;
@@ -56,6 +58,18 @@ public class PeakRefreshRateListPreferenceController extends BasePreferenceContr
 
     private List<String> mEntries = new ArrayList<>();
     private List<String> mValues = new ArrayList<>();
+    private List<Float> mRates = new ArrayList<>();
+
+    // The list offers no rate below the minimum refresh rate, so follow it.
+    private final ContentObserver mMinObserver =
+            new ContentObserver(new Handler(Looper.getMainLooper())) {
+                @Override
+                public void onChange(boolean selfChange) {
+                    if (mListPreference != null) {
+                        updateState(mListPreference);
+                    }
+                }
+            };
 
     private interface IDeviceConfigChange {
         void onDefaultRefreshRateChanged();
@@ -90,6 +104,7 @@ public class PeakRefreshRateListPreferenceController extends BasePreferenceContr
                     mValues.add(mValues.isEmpty()
                             ? "Infinity"
                             : String.format(Locale.US, "%.02f", m.getRefreshRate()));
+                    mRates.add(m.getRefreshRate());
                 }
             }
         }
@@ -100,8 +115,6 @@ public class PeakRefreshRateListPreferenceController extends BasePreferenceContr
         super.displayPreference(screen);
 
         mListPreference = screen.findPreference(getPreferenceKey());
-        mListPreference.setEntries(mEntries.toArray(new String[mEntries.size()]));
-        mListPreference.setEntryValues(mValues.toArray(new String[mValues.size()]));
     }
 
     @Override
@@ -117,6 +130,23 @@ public class PeakRefreshRateListPreferenceController extends BasePreferenceContr
     public void updateState(Preference preference) {
         final float currentValue = Settings.System.getFloat(mContext.getContentResolver(),
                 Settings.System.PEAK_REFRESH_RATE, getDefaultPeakRefreshRate());
+        final float min = Settings.System.getFloat(mContext.getContentResolver(),
+                Settings.System.MIN_REFRESH_RATE, 0f);
+        final List<String> entries = new ArrayList<>();
+        final List<String> values = new ArrayList<>();
+        for (int i = 0; i < mRates.size(); i++) {
+            final float rate = mRates.get(i);
+            // The highest rate is always offered. Keep the current value even if it is below
+            // the minimum, so it shows as set.
+            if (i == 0 || (!Float.isInfinite(min) && Math.round(rate) >= Math.round(min))
+                    || Math.round(rate) == Math.round(currentValue)) {
+                entries.add(mEntries.get(i));
+                values.add(mValues.get(i));
+            }
+        }
+        mListPreference.setEntries(entries.toArray(new String[0]));
+        mListPreference.setEntryValues(values.toArray(new String[0]));
+
         int index = mListPreference.findIndexOfValue(
                 String.format(Locale.US, "%.02f", currentValue));
         if (index < 0) index = 0;
@@ -135,11 +165,15 @@ public class PeakRefreshRateListPreferenceController extends BasePreferenceContr
     @Override
     public void onStart() {
         mDeviceConfigDisplaySettings.startListening();
+        mContext.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(Settings.System.MIN_REFRESH_RATE), false,
+                mMinObserver);
     }
 
     @Override
     public void onStop() {
         mDeviceConfigDisplaySettings.stopListening();
+        mContext.getContentResolver().unregisterContentObserver(mMinObserver);
     }
 
     private float findPeakRefreshRate(Display.Mode[] modes) {
