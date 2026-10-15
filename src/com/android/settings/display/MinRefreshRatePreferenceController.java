@@ -48,13 +48,16 @@ public class MinRefreshRatePreferenceController extends BasePreferenceController
         super(context, KEY_MIN_REFRESH_RATE);
 
         if (mContext.getResources().getBoolean(R.bool.config_show_min_refresh_rate_switch)) {
+            final int lowest = mContext.getResources().getInteger(
+                    R.integer.config_min_refresh_rate_lowest);
             Display.Mode mode = mContext.getDisplay().getMode();
             Display.Mode[] modes = mContext.getDisplay().getSupportedModes();
             Arrays.sort(modes, (mode1, mode2) ->
                 Float.compare(mode2.getRefreshRate(), mode1.getRefreshRate()));
             for (Display.Mode m : modes) {
                 if (m.getPhysicalWidth() == mode.getPhysicalWidth() &&
-                        m.getPhysicalHeight() == mode.getPhysicalHeight()) {
+                        m.getPhysicalHeight() == mode.getPhysicalHeight() &&
+                        Math.round(m.getRefreshRate()) >= lowest) {
                     mEntries.add(String.format("%.02fHz", m.getRefreshRate())
                             .replaceAll("[\\.,]00", ""));
                     mValues.add(String.format(Locale.US, "%.02f", m.getRefreshRate()));
