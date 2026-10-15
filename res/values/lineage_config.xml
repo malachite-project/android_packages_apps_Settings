@@ -55,4 +55,8 @@
     <!-- Whether the display size preference should allow separate DPI settings for each display
          on foldables by having the display size slider only affect the default display. -->
     <bool name="config_independent_display_dpi_setting">false</bool>
+
+    <!-- Refresh rates below this (Hz) are not offered as a minimum refresh rate,
+         e.g. a panel mode meant only for always-on display. 0 offers all. -->
+    <integer name="config_min_refresh_rate_lowest">0</integer>
 </resources>
