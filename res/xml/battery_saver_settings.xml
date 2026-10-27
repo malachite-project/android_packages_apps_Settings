@@ -42,6 +42,14 @@
         settings:keywords="@string/keywords_battery_saver_sticky"
         settings:controller="com.android.settings.fuelgauge.batterysaver.BatterySaverStickyPreferenceController"/>
 
+    <ListPreference
+        android:order="90"
+        android:key="battery_saver_cpu_cap"
+        android:title="@string/battery_saver_cpu_cap_title"
+        android:dialogTitle="@string/battery_saver_cpu_cap_title"
+        android:summary="@string/summary_placeholder"
+        settings:controller="com.android.settings.fuelgauge.batterysaver.BatterySaverCpuCapPreferenceController"/>
+
     <com.android.settingslib.widget.FooterPreference
         android:order="100"
         android:key="battery_saver_footer_preference"
