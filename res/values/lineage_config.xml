@@ -65,4 +65,9 @@
     <!-- Refresh rates below this (Hz) are not offered as a minimum refresh rate,
          e.g. a panel mode meant only for always-on display. 0 offers all. -->
     <integer name="config_min_refresh_rate_lowest">0</integer>
+
+    <!-- Whether Battery saver offers Limit CPU speed. It stores the cap in
+         persist.sys.battery_saver_cpu_cap (percent of top frequency, 0 = off); the device's
+         init scripts must apply it while battery saver is on. -->
+    <bool name="config_battery_saver_cpu_cap">false</bool>
 </resources>
