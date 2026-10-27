@@ -191,4 +191,9 @@
     <string name="face_enrolling_close_to_continue">Fold phone during setup</string>
     <string name="face_enrolling_close_to_continue_description">The phone must be folded to set up or use Face Unlock</string>
     <string name="face_enrolling_do_it_later">Do it later</string>
+
+    <!-- Battery saver: optional CPU speed limit -->
+    <string name="battery_saver_cpu_cap_title">Limit CPU speed</string>
+    <string name="battery_saver_cpu_cap_off">Off</string>
+    <string name="battery_saver_cpu_cap_summary">While battery saver is on, the CPU runs at up to %1$s of its top speed</string>
 </resources>
