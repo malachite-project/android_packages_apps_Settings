@@ -195,4 +195,9 @@
     <!-- Gestures: three-finger screenshot -->
     <string name="three_finger_screenshot_title">Three-finger screenshot</string>
     <string name="three_finger_screenshot_summary">Swipe down with three fingers to take a screenshot</string>
+
+    <!-- Battery saver: optional CPU speed limit -->
+    <string name="battery_saver_cpu_cap_title">Limit CPU speed</string>
+    <string name="battery_saver_cpu_cap_off">Off</string>
+    <string name="battery_saver_cpu_cap_summary">While battery saver is on, the CPU runs at up to %1$s of its top speed</string>
 </resources>
