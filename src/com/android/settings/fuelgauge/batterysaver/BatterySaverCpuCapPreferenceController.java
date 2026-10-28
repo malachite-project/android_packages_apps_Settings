@@ -64,9 +64,12 @@ public class BatterySaverCpuCapPreferenceController extends BasePreferenceContro
     @Override
     public CharSequence getSummary() {
         final int cap = currentCap();
-        return cap == 0
-                ? label(0)
+        final String summary = cap == 0
+                ? label(0).toString()
                 : mContext.getString(R.string.battery_saver_cpu_cap_summary, label(cap));
+        // ListPreference formats its summary with the selected entry, so a literal
+        // "%" (from "70%") must be escaped.
+        return summary.replace("%", "%%");
     }
 
     @Override
