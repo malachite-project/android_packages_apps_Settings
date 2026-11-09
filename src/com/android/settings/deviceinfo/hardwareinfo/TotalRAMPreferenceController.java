@@ -68,13 +68,21 @@ public class TotalRAMPreferenceController extends BasePreferenceController {
         return rounded + " MB";
     }
 
+    /**
+     * MemoryInfo.totalMem is MemTotal from /proc/meminfo, which is the installed RAM minus what
+     * the kernel, modem, DSP, camera and GPU carve out at boot. It is therefore always below the
+     * marketed size, and on some SoCs by well over 1 GB. Round up to the next marketed tier
+     * rather than to the nearest one, otherwise an 8 GB device reporting ~6.9 GB is shown as 6 GB.
+     */
     private static long roundToTier(long mb) {
-        long[] tiers = {1024, 2048, 4096, 6144, 8192, 12288, 16384, 24576};
-        long best = mb, bestDelta = Long.MAX_VALUE;
-        for (long t : tiers) {
-            long d = Math.abs(mb - t);
-            if (d < bestDelta) { bestDelta = d; best = t; }
+        for (long tier : MARKETED_TIERS_MB) {
+            if (mb <= tier) return tier;
         }
-        return best;
+        // Above the largest known tier: round up to the next whole GB.
+        return ((mb + 1023) / 1024) * 1024;
     }
+
+    private static final long[] MARKETED_TIERS_MB = {
+        512, 1024, 2048, 3072, 4096, 6144, 8192, 10240, 12288, 16384, 18432, 24576, 32768
+    };
 }

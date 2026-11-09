@@ -26,6 +26,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.os.PowerManager
 import android.os.UserManager
 import android.util.Log
 import com.android.settings.R
@@ -132,6 +133,7 @@ class BluetoothDevelopmentSettingsFragment :
         use(BluetoothA2dpHwOffloadPreferenceController::class.java)?.onRebootDialogConfirmed()
         use(BluetoothLeAudioHwOffloadPreferenceController::class.java)?.onRebootDialogConfirmed()
         use(BluetoothLeAudioModePreferenceController::class.java)?.onRebootDialogConfirmed()
+        context?.getSystemService(PowerManager::class.java)?.reboot(null)
     }
 
     override fun onRebootDialogCanceled() {
